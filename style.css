@@ -1,0 +1,250 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Georgia, "Times New Roman", serif;
+  background:
+    radial-gradient(circle at center, rgba(255, 180, 80, 0.12), transparent 35%),
+    linear-gradient(135deg, #120905, #050302);
+  color: #2f1c0f;
+}
+
+.scene {
+  min-height: 100vh;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+}
+
+.book {
+  width: min(1000px, 92vw);
+  min-height: 580px;
+  position: relative;
+  perspective: 1600px;
+}
+
+.book-cover,
+.book-pages {
+  width: 100%;
+  min-height: 580px;
+  border-radius: 18px;
+  box-shadow: 0 35px 100px rgba(0, 0, 0, 0.75);
+}
+
+.book-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background:
+    radial-gradient(circle at center, rgba(226, 177, 88, 0.18), transparent 45%),
+    linear-gradient(135deg, #4b2412, #1b0a05);
+  border: 3px solid rgba(221, 170, 82, 0.45);
+  padding: 38px;
+  transform-origin: left;
+  transition: transform 1s ease, opacity 0.7s ease;
+}
+
+.book.open .book-cover {
+  transform: rotateY(-115deg);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.cover-border {
+  min-height: 500px;
+  border: 2px solid rgba(231, 193, 111, 0.55);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #edca7a;
+  text-align: center;
+  padding: 40px;
+}
+
+.cover-subtitle,
+.cover-author {
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #f1dca4;
+}
+
+.cover-border h1 {
+  max-width: 700px;
+  font-size: clamp(2.4rem, 6vw, 5.2rem);
+  margin: 28px 0;
+  line-height: 1.05;
+}
+
+.open-button,
+.navigation button {
+  border: 1px solid rgba(231, 193, 111, 0.6);
+  background: linear-gradient(135deg, #3a1a0c, #160804);
+  color: #f1dca4;
+  border-radius: 999px;
+  padding: 12px 22px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.open-button:hover,
+.navigation button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+}
+
+.book-pages {
+  display: grid;
+  position: relative;
+  overflow: hidden;
+  grid-template-columns: 1fr 1fr;
+  background: #3a1d0e;
+  padding: 24px;
+  gap: 4px;
+}
+
+.page {
+  min-height: 530px;
+  padding: 58px;
+  background:
+    linear-gradient(90deg, rgba(72, 38, 16, 0.18), transparent 12%, transparent 88%, rgba(72, 38, 16, 0.18)),
+    #e8d2a2;
+  box-shadow: inset 0 0 35px rgba(71, 42, 19, 0.35);
+}
+
+.left-page {
+  border-radius: 10px 2px 2px 10px;
+}
+
+.right-page {
+  border-radius: 2px 10px 10px 2px;
+}
+
+.chapter-label {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: #7a4a22;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.page h2 {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  margin: 0 0 24px;
+  color: #3f2412;
+}
+
+.page h3 {
+  font-size: 1.8rem;
+  color: #3f2412;
+}
+
+.page p {
+  font-size: 1.18rem;
+  line-height: 1.8;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: #f1dca4;
+}
+
+.navigation button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 760px) {
+  .book-pages {
+    grid-template-columns: 1fr;
+  }
+
+  .right-page {
+    display: none;
+  }
+
+  .page {
+    padding: 36px;
+  }
+
+  .navigation {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+.turning-page {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: calc(50% - 26px);
+  height: calc(100% - 48px);
+  background:
+    linear-gradient(90deg, rgba(72, 38, 16, 0.18), transparent 12%, transparent 88%, rgba(72, 38, 16, 0.18)),
+    #e8d2a2;
+  border-radius: 2px 10px 10px 2px;
+  box-shadow:
+    inset 0 0 35px rgba(71, 42, 19, 0.35),
+    -20px 0 35px rgba(0, 0, 0, 0.25);
+  transform-origin: left center;
+  transform: rotateY(0deg);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.turning-page.next {
+  animation: turnNext 0.7s ease forwards;
+}
+
+.turning-page.prev {
+  left: 24px;
+  right: auto;
+  border-radius: 10px 2px 2px 10px;
+  transform-origin: right center;
+  animation: turnPrev 0.7s ease forwards;
+}
+
+@keyframes turnNext {
+  0% {
+    opacity: 1;
+    transform: rotateY(0deg);
+  }
+
+  45% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: rotateY(-180deg);
+  }
+}
+
+@keyframes turnPrev {
+  0% {
+    opacity: 1;
+    transform: rotateY(0deg);
+  }
+
+  45% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: rotateY(180deg);
+  }
+}
