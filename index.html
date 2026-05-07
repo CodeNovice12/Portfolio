@@ -8,61 +8,50 @@
 </head>
 <body>
   <main class="scene">
+
     <section class="book" id="book">
-      <div class="book-cover" id="bookCover">
-        <div class="cover-border">
-          <p class="cover-subtitle">Portfólio de Jornada</p>
-          <h1>Crônicas de um Desenvolvedor</h1>
-          <p class="cover-author">Lucas Medeiros</p>
+      <div class="book-inner">
 
-          <button class="open-button" id="openBookButton">
-            Abrir Livro
-          </button>
+        <div class="book-cover" id="bookCover">
+          <div class="cover-border">
+            <p class="cover-subtitle">Portfólio de Jornada</p>
+            <h1>Crônicas de um Desenvolvedor</h1>
+            <p class="cover-author">Lucas Medeiros</p>
+
+            <button class="open-button" id="openBookButton">
+              Abrir Livro
+            </button>
+          </div>
         </div>
+
+        <div class="book-pages" id="bookPages">
+          <article class="page left-page">
+            <span class="chapter-label" id="chapterLabel">Prólogo</span>
+            <h2 id="pageTitle">O Início da Jornada</h2>
+            <p id="pageContent">
+              Toda jornada começa antes mesmo do herói entender o chamado.
+            </p>
+          </article>
+
+          <article class="page right-page">
+            <h3 id="sideTitle">Notas da Jornada</h3>
+            <p id="sideContent">
+              Aqui ficarão os detalhes, projetos, tecnologias e conquistas.
+            </p>
+          </article>
+
+          <div class="turning-page" id="turningPage"></div>
+        </div>
+
       </div>
-
-      <section class="book" id="book">
-  <div class="book-inner">
-
-    <div class="book-cover" id="bookCover">
-      <div class="cover-border">
-        <p class="cover-subtitle">Portfólio de Jornada</p>
-        <h1>Crônicas de um Desenvolvedor</h1>
-        <p class="cover-author">Lucas Medeiros</p>
-
-        <button class="open-button" id="openBookButton">
-          Abrir Livro
-        </button>
-      </div>
-    </div>
-
-    <div class="book-pages" id="bookPages">
-      <article class="page left-page">
-        <span class="chapter-label" id="chapterLabel">Prólogo</span>
-        <h2 id="pageTitle">O Início da Jornada</h2>
-        <p id="pageContent">
-          Toda jornada começa antes mesmo do herói entender o chamado.
-        </p>
-      </article>
-
-      <article class="page right-page">
-        <h3 id="sideTitle">Notas da Jornada</h3>
-        <p id="sideContent">
-          Aqui ficarão os detalhes, projetos, tecnologias e conquistas.
-        </p>
-      </article>
-
-      <div class="turning-page" id="turningPage"></div>
-    </div>
-
-  </div>
-</section>
+    </section>
 
     <nav class="navigation">
       <button id="prevButton">Página anterior</button>
       <span id="pageIndicator">1 / 4</span>
       <button id="nextButton">Próxima página</button>
     </nav>
+
   </main>
 
   <script src="script.js"></script>
