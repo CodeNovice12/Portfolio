@@ -29,7 +29,6 @@ body {
   perspective: 1600px;
 }
 
-.book-cover,
 .book-pages {
   width: 100%;
   min-height: 580px;
@@ -40,14 +39,25 @@ body {
 .book-cover {
   position: absolute;
   inset: 0;
+  width: calc(50% - 2px);
+  height: 100%;
+  left: 0;
+
   z-index: 3;
+
   background:
     radial-gradient(circle at center, rgba(226, 177, 88, 0.18), transparent 45%),
     linear-gradient(135deg, #4b2412, #1b0a05);
+
   border: 3px solid rgba(221, 170, 82, 0.45);
+
   padding: 38px;
+
   transform-origin: left;
-  transition: transform 1s ease, opacity 0.7s ease;
+
+  transition:
+    transform 1s ease,
+    opacity 0.7s ease;
 }
 
 .book.open .book-cover {
