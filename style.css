@@ -1,279 +1,598 @@
-* {
-  box-sizing: border-box;
+/* =============================================
+   VARIÁVEIS E RESET
+   ============================================= */
+:root {
+  --ink:        #1e0f05;
+  --ink-mid:    #3f2412;
+  --ink-light:  #6b3f1e;
+  --gold:       #c9933a;
+  --gold-light: #e8c87a;
+  --gold-dim:   rgba(200, 152, 60, 0.35);
+  --paper:      #e8d5a8;
+  --paper-dark: #d4bc8a;
+  --paper-edge: #c8a96a;
+  --leather:    #3a1a0c;
+  --leather-dark: #1b0905;
+  --leather-mid: #4e2515;
+  --cover-bg:   linear-gradient(160deg, #5a2a12 0%, #2e1108 40%, #1a0905 100%);
+  --shadow-page: rgba(20, 8, 2, 0.55);
+  --flip-dur:   900ms;
+  --flip-ease:  cubic-bezier(0.645, 0.045, 0.355, 1.000);
 }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  margin: 0;
   min-height: 100vh;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: 'IM Fell English', Georgia, serif;
   background:
-    radial-gradient(circle at center, rgba(255, 180, 80, 0.12), transparent 35%),
-    linear-gradient(135deg, #120905, #050302);
-  color: #2f1c0f;
+    radial-gradient(ellipse at 50% 30%, rgba(180, 100, 30, 0.1) 0%, transparent 55%),
+    linear-gradient(160deg, #0e0603 0%, #050201 100%);
+  color: var(--ink);
+  overflow-x: hidden;
 }
 
+/* =============================================
+   PARTÍCULAS DE POEIRA
+   ============================================= */
+.dust-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.dust {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(210,170,90,0.6), transparent 70%);
+  animation: floatDust linear infinite;
+  opacity: 0;
+}
+
+@keyframes floatDust {
+  0%   { opacity: 0; transform: translateY(0) scale(0.5); }
+  15%  { opacity: 1; }
+  85%  { opacity: 0.4; }
+  100% { opacity: 0; transform: translateY(-120vh) scale(1.2) rotate(360deg); }
+}
+
+/* =============================================
+   CENA
+   ============================================= */
 .scene {
   min-height: 100vh;
-  padding: 32px;
+  padding: 32px 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 28px;
-}
-
-.book {
-  width: min(1000px, 92vw);
-  min-height: 580px;
+  gap: 32px;
   position: relative;
-  perspective: 1600px;
+  z-index: 1;
 }
 
-.book-inner {
-  width: 100%;
-  min-height: 580px;
+/* =============================================
+   WRAPPER DO LIVRO
+   ============================================= */
+.book-wrapper {
+  width: min(980px, 94vw);
   position: relative;
 }
 
-.book-pages {
-  width: 100%;
-  min-height: 580px;
-
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-
-  position: relative;
-  overflow: hidden;
-
-  background: #3a1d0e;
-  padding: 24px;
-  gap: 4px;
-
-  border-radius: 18px;
-  box-shadow: 0 35px 100px rgba(0, 0, 0, 0.75);
-
-  visibility: hidden;
-  opacity: 0;
-
-  transition:
-    opacity 0.6s ease,
-    visibility 0.6s ease;
-}
-
+/* =============================================
+   CAPA
+   ============================================= */
 .book-cover {
   position: absolute;
   inset: 0;
-  width: 100%;
-  min-height: 580px;
-
-  z-index: 3;
-
-  background:
-    radial-gradient(circle at center, rgba(226, 177, 88, 0.18), transparent 45%),
-    linear-gradient(135deg, #4b2412, #1b0a05);
-
-  border: 3px solid rgba(221, 170, 82, 0.45);
-  border-radius: 18px;
-
-  padding: 38px;
-
+  z-index: 10;
+  border-radius: 6px 16px 16px 6px;
+  background: var(--cover-bg);
+  box-shadow:
+    -8px 0 0 #0d0503,
+    -12px 4px 16px rgba(0,0,0,0.6),
+    0 30px 80px rgba(0,0,0,0.8),
+    inset 2px 0 8px rgba(255,200,100,0.06);
   transform-origin: left center;
-
-  transition:
-    transform 1s ease,
-    opacity 0.7s ease;
+  transition: transform var(--flip-dur) var(--flip-ease),
+              opacity 600ms ease,
+              box-shadow 600ms ease;
+  overflow: hidden;
 }
 
-.book.open .book-cover {
-  transform: rotateY(-160deg);
-  opacity: 0.05;
+.book-cover.opened {
+  transform: rotateY(-175deg);
+  opacity: 0;
+  pointer-events: none;
 }
 
-.book.open .book-pages {
-  visibility: visible;
-  opacity: 1;
+/* Textura de couro */
+.cover-emboss {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      92deg,
+      transparent 0px,
+      rgba(255,255,255,0.012) 1px,
+      transparent 2px,
+      transparent 8px
+    ),
+    repeating-linear-gradient(
+      2deg,
+      transparent 0px,
+      rgba(0,0,0,0.04) 1px,
+      transparent 2px,
+      transparent 12px
+    );
+  border-radius: inherit;
 }
 
-.cover-border {
-  min-height: 500px;
-  border: 2px solid rgba(231, 193, 111, 0.55);
-  border-radius: 14px;
+/* Lombada */
+.book-spine {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 28px;
+  background: linear-gradient(90deg, #0d0503, #2a1208, #1a0905);
+  border-radius: 6px 0 0 6px;
+  box-shadow: inset -3px 0 6px rgba(0,0,0,0.5);
+}
+
+.cover-inner {
+  margin-left: 28px;
+  height: 100%;
+  min-height: 540px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #edca7a;
-  text-align: center;
-  padding: 40px;
+  padding: 40px 50px;
+  position: relative;
 }
 
-.cover-subtitle,
+.cover-ornament {
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+  position: relative;
+}
+
+.cover-ornament::before,
+.cover-ornament::after {
+  content: '◆';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold-light);
+  font-size: 0.7rem;
+  text-shadow: 0 0 8px var(--gold);
+}
+.cover-ornament::before { left: -10px; }
+.cover-ornament::after  { right: -10px; }
+
+.cover-ornament.top  { margin-bottom: 28px; }
+.cover-ornament.bottom { margin-top: 28px; }
+
+.cover-subtitle {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--gold-light);
+  opacity: 0.8;
+  margin-bottom: 16px;
+}
+
+.cover-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(1.6rem, 3.5vw, 3rem);
+  line-height: 1.2;
+  text-align: center;
+  color: var(--gold-light);
+  text-shadow:
+    0 0 30px rgba(200,150,50,0.5),
+    0 2px 4px rgba(0,0,0,0.8);
+  margin-bottom: 20px;
+}
+
+.cover-divider {
+  width: 40%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  margin: 8px auto 16px;
+}
+
 .cover-author {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: #f1dca4;
+  color: var(--gold);
+  margin-bottom: 36px;
 }
 
-.cover-border h1 {
-  max-width: 100%;
-  word-break: break-word;
-  font-size: clamp(1.8rem, 4vw, 3.8rem);
-  line-height: 1.1;
-  margin: 28px 0;
-}
-
-.open-button,
-.navigation button {
-  border: 1px solid rgba(231, 193, 111, 0.6);
-  background: linear-gradient(135deg, #3a1a0c, #160804);
-  color: #f1dca4;
+.open-button {
+  border: 1px solid var(--gold-dim);
+  background: linear-gradient(135deg, rgba(90,42,18,0.6), rgba(20,8,3,0.8));
+  color: var(--gold-light);
   border-radius: 999px;
-  padding: 12px 22px;
-  font-family: inherit;
+  padding: 12px 32px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 0 1px rgba(200,150,50,0.1), 0 4px 20px rgba(0,0,0,0.4);
 }
 
-.open-button:hover,
-.navigation button:hover {
+.open-button:hover {
+  background: linear-gradient(135deg, rgba(120,60,20,0.7), rgba(40,16,5,0.9));
+  border-color: var(--gold);
+  box-shadow: 0 0 20px rgba(200,150,50,0.25), 0 4px 20px rgba(0,0,0,0.5);
   transform: translateY(-2px);
-  filter: brightness(1.15);
 }
 
+/* =============================================
+   LIVRO ABERTO (PÁGINAS)
+   ============================================= */
+.book-pages {
+  width: 100%;
+  min-height: 560px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+  border-radius: 4px 16px 16px 4px;
+  box-shadow:
+    -10px 0 0 #0a0402,
+    -16px 6px 20px rgba(0,0,0,0.7),
+    0 40px 100px rgba(0,0,0,0.85),
+    0 10px 30px rgba(0,0,0,0.5);
+  overflow: visible;
+
+  /* Escondido até abrir */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.5s ease 0.4s, visibility 0s 0s;
+}
+
+.book-pages.visible {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.5s ease 0.4s;
+}
+
+/* Sombra da lombada no centro */
+.page-gutter {
+  position: absolute;
+  left: 50%;
+  top: 0; bottom: 0;
+  width: 28px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg,
+    rgba(0,0,0,0.18) 0%,
+    rgba(0,0,0,0.35) 30%,
+    rgba(0,0,0,0.5) 50%,
+    rgba(0,0,0,0.35) 70%,
+    rgba(0,0,0,0.18) 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* =============================================
+   PÁGINAS
+   ============================================= */
 .page {
-  min-height: 530px;
-  padding: 58px;
+  min-height: 560px;
+  padding: 52px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Textura de papel */
+.page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background:
-    linear-gradient(90deg, rgba(72, 38, 16, 0.18), transparent 12%, transparent 88%, rgba(72, 38, 16, 0.18)),
-    #e8d2a2;
-  box-shadow: inset 0 0 35px rgba(71, 42, 19, 0.35);
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
+    linear-gradient(180deg,
+      rgba(220,195,150,0.3) 0%,
+      transparent 15%,
+      transparent 85%,
+      rgba(180,150,100,0.2) 100%
+    );
+  pointer-events: none;
+  z-index: 0;
 }
 
 .left-page {
-  border-radius: 10px 2px 2px 10px;
+  background:
+    linear-gradient(90deg, rgba(60,30,10,0.12) 0%, transparent 8%),
+    linear-gradient(90deg, transparent 92%, rgba(60,30,10,0.08) 100%),
+    var(--paper);
+  border-radius: 4px 0 0 4px;
+  box-shadow: inset 8px 0 16px rgba(0,0,0,0.1);
 }
 
 .right-page {
-  border-radius: 2px 10px 10px 2px;
+  background:
+    linear-gradient(90deg, rgba(60,30,10,0.08) 0%, transparent 8%),
+    linear-gradient(90deg, transparent 92%, rgba(60,30,10,0.15) 100%),
+    var(--paper);
+  border-radius: 0 4px 4px 0;
+  box-shadow: inset -8px 0 16px rgba(0,0,0,0.12);
+}
+
+.page-content-inner {
+  position: relative;
+  z-index: 1;
 }
 
 .chapter-label {
   display: inline-block;
-  margin-bottom: 24px;
-  color: #7a4a22;
-  letter-spacing: 2px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 3px;
   text-transform: uppercase;
-  font-size: 0.85rem;
+  color: var(--ink-light);
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(107,63,30,0.3);
+  padding-bottom: 6px;
 }
 
-.page h2 {
-  font-size: clamp(2rem, 4vw, 3.5rem);
-  margin: 0 0 24px;
-  color: #3f2412;
+.page-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 14px;
 }
 
-.page h3 {
-  font-size: 1.8rem;
-  color: #3f2412;
+.side-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: 14px;
 }
 
-.page p {
-  font-size: 1.18rem;
-  line-height: 1.8;
+.page-divider {
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--ink-light), transparent);
+  margin-bottom: 20px;
+  opacity: 0.4;
 }
 
+.page-body {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: var(--ink-mid);
+  font-style: italic;
+}
+
+.page-number {
+  position: absolute;
+  bottom: 24px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  color: var(--ink-light);
+  opacity: 0.6;
+  letter-spacing: 2px;
+}
+.left-num  { left: 48px; }
+.right-num { right: 48px; }
+
+/* =============================================
+   ANIMAÇÃO DE VIRADA DE PÁGINA 3D
+   ============================================= */
+.flip-wrapper {
+  position: absolute;
+  top: 0; right: 0;
+  width: 50%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+  perspective: 2000px;
+}
+
+.flip-page {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  transform: rotateY(0deg);
+  will-change: transform;
+}
+
+/* Frente da página virando (verso direito atual) */
+.flip-front {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  background:
+    linear-gradient(90deg, rgba(60,30,10,0.08) 0%, transparent 8%),
+    linear-gradient(90deg, transparent 92%, rgba(60,30,10,0.15) 100%),
+    var(--paper);
+  border-radius: 0 4px 4px 0;
+}
+
+.flip-front::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg,
+    rgba(255,255,255,0.05) 0%,
+    transparent 40%,
+    rgba(0,0,0,0.06) 100%
+  );
+  pointer-events: none;
+}
+
+/* Verso da página virando (frente esquerda próxima) */
+.flip-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
+  background:
+    linear-gradient(90deg, rgba(60,30,10,0.12) 0%, transparent 8%),
+    var(--paper);
+  border-radius: 4px 0 0 4px;
+}
+
+.flip-back::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(80deg,
+    rgba(0,0,0,0.06) 0%,
+    transparent 40%,
+    rgba(255,255,255,0.04) 100%
+  );
+  pointer-events: none;
+}
+
+/* Sombra que acompanha a virada */
+.flip-shadow {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(90deg,
+    rgba(0,0,0,0.35) 0%,
+    transparent 60%
+  );
+  transition: opacity 0.2s ease;
+}
+
+/* Estados da animação */
+.flip-wrapper.flipping-next .flip-page {
+  animation: flipToLeft var(--flip-dur) var(--flip-ease) forwards;
+}
+
+.flip-wrapper.flipping-prev .flip-page {
+  animation: flipToRight var(--flip-dur) var(--flip-ease) forwards;
+}
+
+.flip-wrapper.flipping-next .flip-shadow,
+.flip-wrapper.flipping-prev .flip-shadow {
+  animation: shadowPulse var(--flip-dur) ease forwards;
+}
+
+@keyframes flipToLeft {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(-180deg); }
+}
+
+@keyframes flipToRight {
+  0%   { transform: rotateY(-180deg); }
+  100% { transform: rotateY(0deg); }
+}
+
+@keyframes shadowPulse {
+  0%   { opacity: 0; }
+  30%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Fade suave do conteúdo durante a virada */
+.page.fading {
+  animation: pageFade 0.25s ease both;
+}
+
+.page.fading-in {
+  animation: pageReveal 0.35s ease 0.5s both;
+}
+
+@keyframes pageFade {
+  to { opacity: 0.3; }
+}
+
+@keyframes pageReveal {
+  from { opacity: 0.3; }
+  to   { opacity: 1; }
+}
+
+/* =============================================
+   NAVEGAÇÃO
+   ============================================= */
 .navigation {
   display: flex;
   align-items: center;
-  gap: 18px;
-  color: #f1dca4;
+  gap: 24px;
+  z-index: 1;
 }
 
-.navigation button:disabled {
-  opacity: 0.4;
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(200,150,60,0.3);
+  background: linear-gradient(135deg, rgba(58,26,12,0.7), rgba(15,6,2,0.9));
+  color: var(--gold-light);
+  border-radius: 999px;
+  padding: 10px 24px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.nav-btn:hover:not(:disabled) {
+  border-color: var(--gold);
+  box-shadow: 0 0 16px rgba(200,150,50,0.2);
+  transform: translateY(-1px);
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
   cursor: not-allowed;
-  transform: none;
 }
 
-@media (max-width: 760px) {
+.nav-arrow {
+  font-size: 0.65rem;
+  opacity: 0.7;
+}
+
+.page-indicator {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  letter-spacing: 3px;
+  color: rgba(210,180,100,0.6);
+  min-width: 60px;
+  text-align: center;
+}
+
+/* =============================================
+   RESPONSIVIDADE
+   ============================================= */
+@media (max-width: 680px) {
   .book-pages {
     grid-template-columns: 1fr;
+    min-height: 480px;
   }
 
-  .right-page {
-    display: none;
+  .right-page, .page-gutter { display: none; }
+
+  .flip-wrapper {
+    width: 100%;
+    left: 0; right: 0;
   }
 
-  .page {
-    padding: 36px;
+  .left-page {
+    border-radius: 4px;
   }
 
-  .navigation {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-}
+  .page { padding: 36px 28px; }
 
-.turning-page {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  width: calc(50% - 26px);
-  height: calc(100% - 48px);
-  background:
-    linear-gradient(90deg, rgba(72, 38, 16, 0.18), transparent 12%, transparent 88%, rgba(72, 38, 16, 0.18)),
-    #e8d2a2;
-  border-radius: 2px 10px 10px 2px;
-  box-shadow:
-    inset 0 0 35px rgba(71, 42, 19, 0.35),
-    -20px 0 35px rgba(0, 0, 0, 0.25);
-  transform-origin: left center;
-  transform: rotateY(0deg);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 5;
-}
-
-.turning-page.next {
-  animation: turnNext 0.7s ease forwards;
-}
-
-.turning-page.prev {
-  left: 24px;
-  right: auto;
-  border-radius: 10px 2px 2px 10px;
-  transform-origin: right center;
-  animation: turnPrev 0.7s ease forwards;
-}
-
-@keyframes turnNext {
-  0% {
-    opacity: 1;
-    transform: rotateY(0deg);
-  }
-
-  45% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    transform: rotateY(-180deg);
-  }
-}
-
-@keyframes turnPrev {
-  0% {
-    opacity: 1;
-    transform: rotateY(0deg);
-  }
-
-  45% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    transform: rotateY(180deg);
-  }
+  .navigation { flex-wrap: wrap; justify-content: center; }
 }
