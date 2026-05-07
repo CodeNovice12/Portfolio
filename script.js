@@ -52,7 +52,9 @@ let currentPage = 0;
 let isAnimating = false;
 
 function openBook() {
-  book.classList.add("open");
+  if (!book.classList.contains("open")) {
+    book.classList.add("open");
+  }
 }
 
 function renderPage() {
