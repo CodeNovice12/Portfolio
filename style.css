@@ -1,23 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap');
+
 /* =============================================
-   VARIÁVEIS E RESET
+   VARIÁVEIS
    ============================================= */
 :root {
-  --ink:        #1e0f05;
-  --ink-mid:    #3f2412;
-  --ink-light:  #6b3f1e;
-  --gold:       #c9933a;
-  --gold-light: #e8c87a;
-  --gold-dim:   rgba(200, 152, 60, 0.35);
-  --paper:      #e8d5a8;
-  --paper-dark: #d4bc8a;
-  --paper-edge: #c8a96a;
-  --leather:    #3a1a0c;
-  --leather-dark: #1b0905;
-  --leather-mid: #4e2515;
-  --cover-bg:   linear-gradient(160deg, #5a2a12 0%, #2e1108 40%, #1a0905 100%);
-  --shadow-page: rgba(20, 8, 2, 0.55);
-  --flip-dur:   900ms;
-  --flip-ease:  cubic-bezier(0.645, 0.045, 0.355, 1.000);
+  --a4-w: 480px;
+  --a4-h: 679px;
+
+  --pergaminho:   #e8d5a0;
+  --papel-escuro: #d4bc82;
+  --sepia:        #7a4a20;
+  --tinta:        #2a1408;
+  --tinta-mid:    #3f2010;
+  --rubi:         #8a3a10;
+  --ouro:         #c9933a;
+  --ouro-claro:   #e8c87a;
+  --ouro-dim:     rgba(200,152,60,0.35);
+  --couro-dk:     #1a0905;
+  --spine-w:      26px;
+
+  --open-dur:     1000ms;
+  --open-ease:    cubic-bezier(0.645, 0.045, 0.355, 1.000);
+  --flip-dur:     850ms;
+  --flip-ease:    cubic-bezier(0.645, 0.045, 0.355, 1.000);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,36 +31,29 @@ body {
   min-height: 100vh;
   font-family: 'IM Fell English', Georgia, serif;
   background:
-    radial-gradient(ellipse at 50% 30%, rgba(180, 100, 30, 0.1) 0%, transparent 55%),
-    linear-gradient(160deg, #0e0603 0%, #050201 100%);
-  color: var(--ink);
+    radial-gradient(ellipse at 50% 30%, rgba(140,80,20,0.13) 0%, transparent 55%),
+    linear-gradient(160deg, #120805 0%, #050201 100%);
+  color: var(--tinta);
   overflow-x: hidden;
 }
 
 /* =============================================
-   PARTÍCULAS DE POEIRA
+   POEIRA
    ============================================= */
 .dust-container {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0; overflow: hidden;
 }
-
 .dust {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(210,170,90,0.6), transparent 70%);
-  animation: floatDust linear infinite;
-  opacity: 0;
+  position: absolute; border-radius: 50%;
+  background: radial-gradient(circle, rgba(210,170,90,0.5), transparent 70%);
+  animation: floatDust linear infinite; opacity: 0;
 }
-
 @keyframes floatDust {
   0%   { opacity: 0; transform: translateY(0) scale(0.5); }
-  15%  { opacity: 1; }
-  85%  { opacity: 0.4; }
-  100% { opacity: 0; transform: translateY(-120vh) scale(1.2) rotate(360deg); }
+  15%  { opacity: 0.9; }
+  85%  { opacity: 0.3; }
+  100% { opacity: 0; transform: translateY(-120vh) scale(1.3) rotate(360deg); }
 }
 
 /* =============================================
@@ -63,536 +61,502 @@ body {
    ============================================= */
 .scene {
   min-height: 100vh;
-  padding: 32px 20px;
+  padding: 40px 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 32px;
+  gap: 28px;
+  position: relative; z-index: 1;
+}
+
+/* =============================================
+   WRAPPER — expande de 1 para 2 A4
+   ============================================= */
+.book-wrapper {
   position: relative;
+  width: var(--a4-w);
+  height: var(--a4-h);
+  /* A expansão de largura é animada via JS adicionando .is-open */
+  transition: width var(--open-dur) var(--open-ease);
+}
+
+.book-wrapper.is-open {
+  width: calc(var(--a4-w) * 2);
+}
+
+/* =============================================
+   LIVRO FECHADO
+   ============================================= */
+.book-closed {
+  position: absolute;
+  inset: 0;
+  width: var(--a4-w);
+  height: var(--a4-h);
+  /* Perspectiva para a animação 3D da capa */
+  perspective: 2400px;
+}
+
+/* --- Lombada --- */
+.spine {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: var(--spine-w);
+  background: linear-gradient(90deg, #060201, #1c0b04, #0e0503);
+  border-radius: 4px 0 0 4px;
+  box-shadow: inset -3px 0 6px rgba(0,0,0,0.55);
+  z-index: 2;
+}
+
+/* --- Contra capa --- */
+.back-cover {
+  position: absolute;
+  left: var(--spine-w); top: 0;
+  width: calc(var(--a4-w) - var(--spine-w));
+  height: var(--a4-h);
+  background: linear-gradient(160deg, #3a1a0c 0%, #1a0905 100%);
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 1;
 }
 
-/* =============================================
-   WRAPPER DO LIVRO
-   ============================================= */
-.book-wrapper {
-  width: min(980px, 94vw);
-  position: relative;
+.back-cover-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px;
 }
 
-/* =============================================
-   CAPA
-   ============================================= */
-.book-cover {
+.back-ornament {
+  width: 160px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--ouro), transparent);
+}
+
+.back-tagline {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ouro);
+  opacity: 0.55;
+  text-align: center;
+}
+
+/* --- Capa (frente) --- */
+.front-cover {
   position: absolute;
-  inset: 0;
-  z-index: 10;
-  border-radius: 6px 16px 16px 6px;
-  background: var(--cover-bg);
+  left: var(--spine-w); top: 0;
+  width: calc(var(--a4-w) - var(--spine-w));
+  height: var(--a4-h);
+  z-index: 3;
+
+  background: linear-gradient(160deg, #5a2a12 0%, #2e1108 40%, #1a0905 100%);
+  border-radius: 0 8px 8px 0;
   box-shadow:
-    -8px 0 0 #0d0503,
-    -12px 4px 16px rgba(0,0,0,0.6),
-    0 30px 80px rgba(0,0,0,0.8),
-    inset 2px 0 8px rgba(255,200,100,0.06);
+    4px 0 20px rgba(0,0,0,0.5),
+    0 20px 60px rgba(0,0,0,0.7);
+
   transform-origin: left center;
-  transition: transform var(--flip-dur) var(--flip-ease),
-              opacity 600ms ease,
-              box-shadow 600ms ease;
-  overflow: hidden;
+  transform-style: preserve-3d;
+
+  /* Transição de abertura */
+  transition:
+    transform var(--open-dur) var(--open-ease),
+    box-shadow var(--open-dur) ease;
 }
 
-.book-cover.opened {
-  transform: rotateY(-175deg);
-  opacity: 0;
+/* Quando abre: capa vira para esquerda */
+.book-wrapper.is-open .front-cover {
+  transform: rotateY(-180deg);
+  box-shadow: none;
   pointer-events: none;
 }
 
 /* Textura de couro */
-.cover-emboss {
-  position: absolute;
-  inset: 0;
-  background:
-    repeating-linear-gradient(
-      92deg,
-      transparent 0px,
-      rgba(255,255,255,0.012) 1px,
-      transparent 2px,
-      transparent 8px
-    ),
-    repeating-linear-gradient(
-      2deg,
-      transparent 0px,
-      rgba(0,0,0,0.04) 1px,
-      transparent 2px,
-      transparent 12px
-    );
+.cover-texture {
+  position: absolute; inset: 0;
   border-radius: inherit;
-}
-
-/* Lombada */
-.book-spine {
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 28px;
-  background: linear-gradient(90deg, #0d0503, #2a1208, #1a0905);
-  border-radius: 6px 0 0 6px;
-  box-shadow: inset -3px 0 6px rgba(0,0,0,0.5);
+  background:
+    repeating-linear-gradient(92deg, transparent 0, rgba(255,255,255,0.012) 1px, transparent 2px, transparent 8px),
+    repeating-linear-gradient(2deg,  transparent 0, rgba(0,0,0,0.045) 1px, transparent 2px, transparent 12px);
+  pointer-events: none;
 }
 
 .cover-inner {
-  margin-left: 28px;
   height: 100%;
-  min-height: 540px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 40px 50px;
+  padding: 44px 42px;
   position: relative;
+  z-index: 1;
 }
 
 .cover-ornament {
   width: 80%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
 }
+.cover-ornament.bottom { margin-bottom: 0; margin-top: 22px; }
 
-.cover-ornament::before,
-.cover-ornament::after {
-  content: '◆';
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--gold-light);
-  font-size: 0.7rem;
-  text-shadow: 0 0 8px var(--gold);
+.orn-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--ouro), var(--ouro-claro), var(--ouro), transparent);
 }
-.cover-ornament::before { left: -10px; }
-.cover-ornament::after  { right: -10px; }
-
-.cover-ornament.top  { margin-bottom: 28px; }
-.cover-ornament.bottom { margin-top: 28px; }
+.orn-sym {
+  font-size: 0.6rem;
+  color: var(--ouro-claro);
+  letter-spacing: 4px;
+  text-shadow: 0 0 8px var(--ouro);
+}
 
 .cover-subtitle {
   font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
   letter-spacing: 4px;
   text-transform: uppercase;
-  font-size: 0.72rem;
-  color: var(--gold-light);
-  opacity: 0.8;
+  color: var(--ouro-claro);
+  opacity: 0.75;
   margin-bottom: 16px;
 }
 
 .cover-title {
   font-family: 'Cinzel Decorative', serif;
-  font-size: clamp(1.6rem, 3.5vw, 3rem);
-  line-height: 1.2;
+  font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+  line-height: 1.25;
   text-align: center;
-  color: var(--gold-light);
-  text-shadow:
-    0 0 30px rgba(200,150,50,0.5),
-    0 2px 4px rgba(0,0,0,0.8);
-  margin-bottom: 20px;
+  color: var(--ouro-claro);
+  text-shadow: 0 0 28px rgba(200,150,50,0.4), 0 2px 4px rgba(0,0,0,0.9);
+  margin-bottom: 14px;
 }
 
 .cover-divider {
-  width: 40%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-  margin: 8px auto 16px;
+  width: 36%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--ouro-dim), transparent);
+  margin: 4px auto 16px;
 }
 
 .cover-author {
   font-family: 'Cinzel', serif;
-  font-size: 1rem;
+  font-size: 0.88rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 36px;
+  color: var(--ouro);
+  margin-bottom: 30px;
 }
 
-.open-button {
-  border: 1px solid var(--gold-dim);
-  background: linear-gradient(135deg, rgba(90,42,18,0.6), rgba(20,8,3,0.8));
-  color: var(--gold-light);
+.open-btn {
+  border: 1px solid var(--ouro-dim);
+  background: linear-gradient(135deg, rgba(78,37,13,0.65), rgba(16,6,2,0.9));
+  color: var(--ouro-claro);
   border-radius: 999px;
-  padding: 12px 32px;
+  padding: 11px 28px;
   font-family: 'Cinzel', serif;
-  font-size: 0.85rem;
+  font-size: 0.76rem;
   letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 0 1px rgba(200,150,50,0.1), 0 4px 20px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.45);
 }
-
-.open-button:hover {
-  background: linear-gradient(135deg, rgba(120,60,20,0.7), rgba(40,16,5,0.9));
-  border-color: var(--gold);
-  box-shadow: 0 0 20px rgba(200,150,50,0.25), 0 4px 20px rgba(0,0,0,0.5);
+.open-btn:hover {
+  border-color: var(--ouro);
+  box-shadow: 0 0 18px rgba(200,150,50,0.22), 0 4px 18px rgba(0,0,0,0.5);
   transform: translateY(-2px);
 }
 
 /* =============================================
-   LIVRO ABERTO (PÁGINAS)
+   LIVRO ABERTO
    ============================================= */
-.book-pages {
-  width: 100%;
-  min-height: 560px;
+.book-open {
+  position: absolute;
+  top: 0; left: 0;
+  width: calc(var(--a4-w) * 2);
+  height: var(--a4-h);
+
   display: grid;
   grid-template-columns: 1fr 1fr;
-  position: relative;
-  border-radius: 4px 16px 16px 4px;
+
+  border-radius: 4px 8px 8px 4px;
   box-shadow:
-    -10px 0 0 #0a0402,
-    -16px 6px 20px rgba(0,0,0,0.7),
-    0 40px 100px rgba(0,0,0,0.85),
-    0 10px 30px rgba(0,0,0,0.5);
-  overflow: visible;
+    -10px 0 0 #070201,
+    -18px 6px 24px rgba(0,0,0,0.7),
+    0 40px 100px rgba(0,0,0,0.9);
 
-  /* Escondido até abrir */
-  visibility: hidden;
+  /* Começa invisível */
   opacity: 0;
-  transition: opacity 0.5s ease 0.4s, visibility 0s 0s;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
 }
 
-.book-pages.visible {
-  visibility: visible;
+/* Aparece depois que a capa terminou de virar */
+.book-wrapper.is-open .book-open {
   opacity: 1;
-  transition: opacity 0.5s ease 0.4s;
+  pointer-events: all;
+  /* Delay para aparecer só depois da capa virar */
+  transition: opacity 0.4s ease calc(var(--open-dur) * 0.6);
 }
 
-/* Sombra da lombada no centro */
-.page-gutter {
+/* Sombra lombada central */
+.gutter {
   position: absolute;
-  left: 50%;
-  top: 0; bottom: 0;
-  width: 28px;
+  left: 50%; top: 0; bottom: 0;
+  width: 32px;
   transform: translateX(-50%);
   background: linear-gradient(90deg,
-    rgba(0,0,0,0.18) 0%,
-    rgba(0,0,0,0.35) 30%,
-    rgba(0,0,0,0.5) 50%,
-    rgba(0,0,0,0.35) 70%,
-    rgba(0,0,0,0.18) 100%
+    rgba(0,0,0,0.12) 0%,
+    rgba(0,0,0,0.4) 30%,
+    rgba(0,0,0,0.55) 50%,
+    rgba(0,0,0,0.4) 70%,
+    rgba(0,0,0,0.12) 100%
   );
-  z-index: 2;
-  pointer-events: none;
+  z-index: 2; pointer-events: none;
 }
 
 /* =============================================
    PÁGINAS
    ============================================= */
 .page {
-  min-height: 560px;
-  padding: 52px 48px;
+  height: var(--a4-h);
+  padding: 52px 44px 44px;
   position: relative;
   overflow: hidden;
 }
 
-/* Textura de papel */
-.page::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
-    linear-gradient(180deg,
-      rgba(220,195,150,0.3) 0%,
-      transparent 15%,
-      transparent 85%,
-      rgba(180,150,100,0.2) 100%
-    );
-  pointer-events: none;
-  z-index: 0;
-}
-
 .left-page {
   background:
-    linear-gradient(90deg, rgba(60,30,10,0.12) 0%, transparent 8%),
-    linear-gradient(90deg, transparent 92%, rgba(60,30,10,0.08) 100%),
-    var(--paper);
+    linear-gradient(90deg, rgba(60,28,8,0.15) 0%, transparent 7%),
+    var(--pergaminho);
   border-radius: 4px 0 0 4px;
-  box-shadow: inset 8px 0 16px rgba(0,0,0,0.1);
+  box-shadow: inset 8px 0 18px rgba(0,0,0,0.1);
 }
 
 .right-page {
   background:
-    linear-gradient(90deg, rgba(60,30,10,0.08) 0%, transparent 8%),
-    linear-gradient(90deg, transparent 92%, rgba(60,30,10,0.15) 100%),
-    var(--paper);
-  border-radius: 0 4px 4px 0;
-  box-shadow: inset -8px 0 16px rgba(0,0,0,0.12);
+    linear-gradient(270deg, rgba(60,28,8,0.16) 0%, transparent 7%),
+    var(--pergaminho);
+  border-radius: 0 8px 8px 0;
+  box-shadow: inset -8px 0 18px rgba(0,0,0,0.12);
 }
 
-.page-content-inner {
-  position: relative;
-  z-index: 1;
+/* Vinheta de papel nas bordas */
+.page::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(180,150,90,0.18) 0%, transparent 10%,
+    transparent 90%, rgba(150,120,70,0.14) 100%);
+  pointer-events: none;
 }
 
-.chapter-label {
-  display: inline-block;
+.page-inner { position: relative; z-index: 1; }
+
+.chapter-tag {
+  display: block;
   font-family: 'Cinzel', serif;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: var(--ink-light);
-  margin-bottom: 20px;
-  border-bottom: 1px solid rgba(107,63,30,0.3);
-  padding-bottom: 6px;
+  color: var(--sepia);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(120,75,30,0.3);
 }
 
 .page-title {
   font-family: 'Cinzel Decorative', serif;
-  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
-  color: var(--ink);
+  font-size: clamp(1.1rem, 1.9vw, 1.75rem);
+  color: var(--tinta);
   line-height: 1.2;
   margin-bottom: 14px;
 }
 
 .side-title {
   font-family: 'Cinzel', serif;
-  font-size: clamp(1.1rem, 2vw, 1.6rem);
-  color: var(--ink);
+  font-size: clamp(1rem, 1.7vw, 1.4rem);
+  color: var(--tinta);
   line-height: 1.3;
   margin-bottom: 14px;
 }
 
-.page-divider {
-  width: 60%;
-  height: 1px;
-  background: linear-gradient(90deg, var(--ink-light), transparent);
+.page-rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 20px;
-  opacity: 0.4;
+  width: 65%;
 }
+.rule-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(120,75,30,0.5), transparent);
+}
+.rule-sym { font-size: 0.58rem; color: var(--ouro); }
 
 .page-body {
-  font-size: 1.05rem;
-  line-height: 1.9;
-  color: var(--ink-mid);
+  font-size: 1rem;
+  line-height: 1.92;
+  color: var(--tinta-mid);
   font-style: italic;
 }
 
-.page-number {
+.pg-num {
   position: absolute;
-  bottom: 24px;
+  bottom: 26px;
   font-family: 'Cinzel', serif;
-  font-size: 0.78rem;
-  color: var(--ink-light);
-  opacity: 0.6;
+  font-size: 0.7rem;
+  color: var(--sepia);
+  opacity: 0.55;
   letter-spacing: 2px;
 }
-.left-num  { left: 48px; }
-.right-num { right: 48px; }
+.left-n  { left: 44px; }
+.right-n { right: 44px; }
 
 /* =============================================
-   ANIMAÇÃO DE VIRADA DE PÁGINA 3D
+   FLIP DE PÁGINA
    ============================================= */
-.flip-wrapper {
+.flip-wrap {
   position: absolute;
   top: 0; right: 0;
-  width: 50%;
-  height: 100%;
+  width: 50%; height: 100%;
   z-index: 5;
   pointer-events: none;
-  perspective: 2000px;
+  perspective: 2200px;
 }
 
-.flip-page {
-  position: absolute;
-  inset: 0;
+.flip {
+  position: absolute; inset: 0;
   transform-style: preserve-3d;
   transform-origin: left center;
-  transform: rotateY(0deg);
   will-change: transform;
 }
 
-/* Frente da página virando (verso direito atual) */
+.flip-front, .flip-back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+}
+
 .flip-front {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
   background:
-    linear-gradient(90deg, rgba(60,30,10,0.08) 0%, transparent 8%),
-    linear-gradient(90deg, transparent 92%, rgba(60,30,10,0.15) 100%),
-    var(--paper);
-  border-radius: 0 4px 4px 0;
+    linear-gradient(270deg, rgba(60,28,8,0.16) 0%, transparent 7%),
+    var(--pergaminho);
+  border-radius: 0 8px 8px 0;
 }
 
-.flip-front::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(100deg,
-    rgba(255,255,255,0.05) 0%,
-    transparent 40%,
-    rgba(0,0,0,0.06) 100%
-  );
-  pointer-events: none;
-}
-
-/* Verso da página virando (frente esquerda próxima) */
 .flip-back {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
   transform: rotateY(180deg);
   background:
-    linear-gradient(90deg, rgba(60,30,10,0.12) 0%, transparent 8%),
-    var(--paper);
+    linear-gradient(90deg, rgba(60,28,8,0.15) 0%, transparent 7%),
+    var(--pergaminho);
   border-radius: 4px 0 0 4px;
 }
 
-.flip-back::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(80deg,
-    rgba(0,0,0,0.06) 0%,
-    transparent 40%,
-    rgba(255,255,255,0.04) 100%
-  );
-  pointer-events: none;
-}
-
-/* Sombra que acompanha a virada */
 .flip-shadow {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  opacity: 0;
-  background: linear-gradient(90deg,
-    rgba(0,0,0,0.35) 0%,
-    transparent 60%
-  );
-  transition: opacity 0.2s ease;
+  position: absolute; inset: 0;
+  pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.38) 0%, transparent 65%);
 }
 
-/* Estados da animação */
-.flip-wrapper.flipping-next .flip-page {
-  animation: flipToLeft var(--flip-dur) var(--flip-ease) forwards;
+.flip-wrap.to-left .flip {
+  animation: flipLeft var(--flip-dur) var(--flip-ease) forwards;
 }
-
-.flip-wrapper.flipping-prev .flip-page {
-  animation: flipToRight var(--flip-dur) var(--flip-ease) forwards;
+.flip-wrap.to-right .flip {
+  animation: flipRight var(--flip-dur) var(--flip-ease) forwards;
 }
-
-.flip-wrapper.flipping-next .flip-shadow,
-.flip-wrapper.flipping-prev .flip-shadow {
+.flip-wrap.to-left .flip-shadow,
+.flip-wrap.to-right .flip-shadow {
   animation: shadowPulse var(--flip-dur) ease forwards;
 }
 
-@keyframes flipToLeft {
-  0%   { transform: rotateY(0deg); }
-  100% { transform: rotateY(-180deg); }
-}
-
-@keyframes flipToRight {
-  0%   { transform: rotateY(-180deg); }
-  100% { transform: rotateY(0deg); }
-}
+@keyframes flipLeft  { 0% { transform: rotateY(0deg);    } 100% { transform: rotateY(-180deg); } }
+@keyframes flipRight { 0% { transform: rotateY(-180deg); } 100% { transform: rotateY(0deg);    } }
 
 @keyframes shadowPulse {
   0%   { opacity: 0; }
-  30%  { opacity: 1; }
-  70%  { opacity: 1; }
+  35%  { opacity: 1; }
+  65%  { opacity: 1; }
   100% { opacity: 0; }
 }
 
-/* Fade suave do conteúdo durante a virada */
-.page.fading {
-  animation: pageFade 0.25s ease both;
+.page.reveal {
+  animation: pageReveal 0.4s ease 0.5s both;
 }
-
-.page.fading-in {
-  animation: pageReveal 0.35s ease 0.5s both;
-}
-
-@keyframes pageFade {
-  to { opacity: 0.3; }
-}
-
 @keyframes pageReveal {
-  from { opacity: 0.3; }
+  from { opacity: 0.2; }
   to   { opacity: 1; }
 }
 
 /* =============================================
    NAVEGAÇÃO
    ============================================= */
-.navigation {
+.nav {
   display: flex;
   align-items: center;
   gap: 24px;
   z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.book-wrapper.is-open ~ .nav {
+  opacity: 1;
+  pointer-events: all;
+  transition: opacity 0.4s ease calc(var(--open-dur) * 0.7);
 }
 
 .nav-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   border: 1px solid rgba(200,150,60,0.3);
-  background: linear-gradient(135deg, rgba(58,26,12,0.7), rgba(15,6,2,0.9));
-  color: var(--gold-light);
+  background: linear-gradient(135deg, rgba(58,26,12,0.75), rgba(14,5,2,0.92));
+  color: var(--ouro-claro);
   border-radius: 999px;
-  padding: 10px 24px;
+  padding: 10px 22px;
   font-family: 'Cinzel', serif;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.25s ease;
 }
-
 .nav-btn:hover:not(:disabled) {
-  border-color: var(--gold);
-  box-shadow: 0 0 16px rgba(200,150,50,0.2);
+  border-color: var(--ouro);
+  box-shadow: 0 0 14px rgba(200,150,50,0.2);
   transform: translateY(-1px);
 }
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-.nav-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.nav-arrow {
-  font-size: 0.65rem;
-  opacity: 0.7;
-}
-
-.page-indicator {
+.nav-ind {
   font-family: 'Cinzel', serif;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   letter-spacing: 3px;
-  color: rgba(210,180,100,0.6);
+  color: rgba(210,180,100,0.55);
   min-width: 60px;
   text-align: center;
 }
 
 /* =============================================
-   RESPONSIVIDADE
+   RESPONSIVO
    ============================================= */
 @media (max-width: 680px) {
-  .book-pages {
+  :root {
+    --a4-w: 88vw;
+    --a4-h: calc(88vw * 1.414);
+  }
+
+  .book-wrapper.is-open { width: 88vw; }
+
+  .book-open {
+    width: 88vw;
     grid-template-columns: 1fr;
-    min-height: 480px;
   }
 
-  .right-page, .page-gutter { display: none; }
-
-  .flip-wrapper {
-    width: 100%;
-    left: 0; right: 0;
-  }
-
-  .left-page {
-    border-radius: 4px;
-  }
-
+  .right-page, .gutter { display: none; }
+  .left-page { border-radius: 4px 8px 8px 4px; }
+  .flip-wrap { width: 100%; left: 0; right: 0; }
   .page { padding: 36px 28px; }
-
-  .navigation { flex-wrap: wrap; justify-content: center; }
+  .nav { flex-wrap: wrap; justify-content: center; }
 }

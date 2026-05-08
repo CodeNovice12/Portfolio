@@ -11,86 +11,122 @@
 </head>
 <body>
 
-  <!-- Partículas de poeira -->
   <div class="dust-container" id="dustContainer"></div>
 
   <main class="scene">
 
-    <section class="book-wrapper">
+    <!--
+      ESTRUTURA:
+      .book-wrapper   → começa com 1 A4, expande para 2 A4 ao abrir
+        .book-closed  → capa + contra capa (visível quando fechado)
+        .book-open    → duas páginas lado a lado (visível quando aberto)
+    -->
+    <div class="book-wrapper" id="bookWrapper">
 
-      <!-- Capa -->
-      <div class="book-cover" id="bookCover">
-        <div class="cover-emboss"></div>
-        <div class="cover-inner">
-          <div class="cover-ornament top"></div>
-          <p class="cover-subtitle">Portfólio de Jornada</p>
-          <h1 class="cover-title">Crônicas de um<br>Desenvolvedor</h1>
-          <div class="cover-divider"></div>
-          <p class="cover-author">Lucas Medeiros</p>
-          <button class="open-button" id="openBookButton">
-            <span class="open-button-text">Abrir o Livro</span>
-          </button>
-          <div class="cover-ornament bottom"></div>
-        </div>
+      <!-- ========== LIVRO FECHADO ========== -->
+      <div class="book-closed" id="bookClosed">
+
         <!-- Lombada -->
-        <div class="book-spine"></div>
+        <div class="spine"></div>
+
+        <!-- Contra capa (fica por baixo, lado esquerdo) -->
+        <div class="back-cover">
+          <div class="back-cover-inner">
+            <div class="back-ornament"></div>
+            <p class="back-tagline">Uma jornada contada em código</p>
+            <div class="back-ornament"></div>
+          </div>
+        </div>
+
+        <!-- Capa (fica por cima, lado direito — vira para esquerda ao abrir) -->
+        <div class="front-cover" id="frontCover">
+          <div class="cover-texture"></div>
+          <div class="cover-inner">
+            <div class="cover-ornament">
+              <div class="orn-line"></div>
+              <span class="orn-sym">◆ ✦ ◆</span>
+              <div class="orn-line"></div>
+            </div>
+            <p class="cover-subtitle">Portfólio de Jornada</p>
+            <h1 class="cover-title">Crônicas de um<br>Desenvolvedor</h1>
+            <div class="cover-divider"></div>
+            <p class="cover-author">Lucas Medeiros</p>
+            <button class="open-btn" id="openBtn">
+              ✦ &nbsp;Abrir o Livro&nbsp; ✦
+            </button>
+            <div class="cover-ornament bottom">
+              <div class="orn-line"></div>
+              <span class="orn-sym">◆ ✦ ◆</span>
+              <div class="orn-line"></div>
+            </div>
+          </div>
+        </div>
+
       </div>
+      <!-- fim .book-closed -->
 
-      <!-- Páginas do livro -->
-      <div class="book-pages" id="bookPages">
+      <!-- ========== LIVRO ABERTO ========== -->
+      <div class="book-open" id="bookOpen">
 
-        <!-- Sombra central (lombada) -->
-        <div class="page-gutter"></div>
+        <!-- Sombra da lombada -->
+        <div class="gutter"></div>
 
-        <!-- Página esquerda atual -->
+        <!-- Página esquerda -->
         <article class="page left-page" id="leftPage">
-          <div class="page-content-inner">
-            <span class="chapter-label" id="chapterLabel">Prólogo</span>
+          <div class="page-inner">
+            <span class="chapter-tag" id="chapterLabel">◆ &nbsp;Prólogo&nbsp; ◆</span>
             <h2 class="page-title" id="pageTitle">O Início da Jornada</h2>
-            <div class="page-divider"></div>
+            <div class="page-rule">
+              <div class="rule-line"></div>
+              <span class="rule-sym">✦</span>
+              <div class="rule-line"></div>
+            </div>
             <p class="page-body" id="pageContent">
               Toda jornada começa antes mesmo do herói entender o chamado.
+              Foram anos aprendendo a linguagem dos dados, antes de perceber
+              que a programação seria o mapa para o destino.
             </p>
           </div>
-          <div class="page-number left-num" id="pageNumLeft">i</div>
+          <span class="pg-num left-n" id="pgLeft">— I —</span>
         </article>
 
-        <!-- Página direita atual -->
+        <!-- Página direita -->
         <article class="page right-page" id="rightPage">
-          <div class="page-content-inner">
+          <div class="page-inner">
             <h3 class="side-title" id="sideTitle">Notas da Jornada</h3>
-            <div class="page-divider"></div>
+            <div class="page-rule">
+              <div class="rule-line"></div>
+              <span class="rule-sym">✦</span>
+              <div class="rule-line"></div>
+            </div>
             <p class="page-body" id="sideContent">
-              Aqui ficarão os detalhes, projetos, tecnologias e conquistas.
+              Aqui ficarão os detalhes, projetos, tecnologias e conquistas
+              de cada capítulo desta história.
             </p>
           </div>
-          <div class="page-number right-num" id="pageNumRight">ii</div>
+          <span class="pg-num right-n" id="pgRight">— I —</span>
         </article>
 
-        <!-- Página virando (frente e verso) -->
-        <div class="flip-wrapper" id="flipWrapper">
-          <div class="flip-page" id="flipPage">
+        <!-- Página virando -->
+        <div class="flip-wrap" id="flipWrap">
+          <div class="flip" id="flip">
             <div class="flip-front" id="flipFront"></div>
-            <div class="flip-back" id="flipBack"></div>
+            <div class="flip-back"  id="flipBack"></div>
           </div>
-          <div class="flip-shadow" id="flipShadow"></div>
+          <div class="flip-shadow"></div>
         </div>
 
       </div>
+      <!-- fim .book-open -->
 
-    </section>
+    </div>
+    <!-- fim .book-wrapper -->
 
-    <!-- Navegação -->
-    <nav class="navigation">
-      <button class="nav-btn" id="prevButton" disabled>
-        <span class="nav-arrow">◄</span>
-        <span>Página anterior</span>
-      </button>
-      <span class="page-indicator" id="pageIndicator">I / IV</span>
-      <button class="nav-btn" id="nextButton">
-        <span>Próxima página</span>
-        <span class="nav-arrow">►</span>
-      </button>
+    <!-- Navegação (só aparece com livro aberto) -->
+    <nav class="nav" id="nav">
+      <button class="nav-btn" id="prevBtn" disabled>◄ &nbsp;Anterior</button>
+      <span class="nav-ind" id="navInd">I / IV</span>
+      <button class="nav-btn" id="nextBtn">Próxima &nbsp;►</button>
     </nav>
 
   </main>

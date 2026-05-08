@@ -1,245 +1,249 @@
 /* =============================================
-   DADOS DAS PÁGINAS
+   CONTEÚDO DAS PÁGINAS
    ============================================= */
 const pages = [
   {
-    chapter: "Prólogo",
+    chapter: "◆  Prólogo  ◆",
     title: "O Início da Jornada",
     content: "Toda jornada começa antes mesmo do herói entender o chamado. Foram anos aprendendo a linguagem dos dados, antes de perceber que a programação seria o mapa para o destino.",
     sideTitle: "Quem é Lucas",
-    sideContent: "29 anos, analista em People Analytics na Stellantis. 6 anos como assistente administrativo moldaram o olhar para processos — a tecnologia veio transformar esse olhar em soluções.",
-    pageNum: "I"
+    sideContent: "29 anos, analista em People Analytics na Stellantis. 6 anos como assistente administrativo moldaram o olhar para processos — a tecnologia veio transformar esse olhar em soluções reais.",
+    num: "— I —"
   },
   {
-    chapter: "Capítulo I",
+    chapter: "◆  Capítulo I  ◆",
     title: "O Aprendiz dos Dados",
-    content: "Antes das grandes criações, vieram planilhas, análises e indicadores. A arte de transformar números em decisões — Python, SQL e Power BI como primeiras armas nesta jornada.",
+    content: "Antes das grandes criações, vieram planilhas, análises e indicadores. A arte de transformar números em decisões — Python, SQL e Power BI como primeiras armas desta jornada.",
     sideTitle: "Ferramentas & Tecnologias",
-    sideContent: "Python · Pandas · Power BI · SQL · BigQuery · Streamlit · Automações em Excel · Análise de dados para RH e People Analytics.",
-    pageNum: "II"
+    sideContent: "Python · Pandas · Power BI · SQL · BigQuery · Streamlit · Automações em Excel · Análise de dados para RH e People Analytics na Stellantis.",
+    num: "— II —"
   },
   {
-    chapter: "Capítulo II",
+    chapter: "◆  Capítulo II  ◆",
     title: "As Primeiras Ferramentas",
     content: "A forja do desenvolvedor web: HTML que estrutura mundos, CSS que os pinta, JavaScript que lhes dá vida. Vue e Laravel como aliados para batalhas de maior porte.",
     sideTitle: "Projetos Web",
     sideContent: "Portfólio-livro interativo · Org Chart com Dash/Plotly · Landing pages · Interfaces com Vue3 · Sistemas com Laravel · Componentes JavaScript puros.",
-    pageNum: "III"
+    num: "— III —"
   },
   {
-    chapter: "Epílogo",
+    chapter: "◆  Epílogo  ◆",
     title: "O Caminho Adiante",
     content: "A jornada não termina — ela se expande. Data Engineering, Machine Learning, Generative AI e uma marca pessoal sendo construída uma linha de código por vez.",
     sideTitle: "Contato & Conexões",
-    sideContent: "GitHub · LinkedIn · YouTube · Instagram\n\nEm construção: conteúdo sobre a jornada em tech — aprendendo em público, errando e crescendo.",
-    pageNum: "IV"
+    sideContent: "GitHub · LinkedIn · YouTube · Instagram\n\nConteúdo sobre a jornada em tech — aprendendo em público, errando e crescendo.",
+    num: "— IV —"
   }
 ];
 
 /* =============================================
-   ELEMENTOS DO DOM
+   ELEMENTOS
    ============================================= */
-const bookCover    = document.getElementById('bookCover');
-const bookPages    = document.getElementById('bookPages');
-const openBookBtn  = document.getElementById('openBookButton');
+const bookWrapper = document.getElementById('bookWrapper');
+const openBtn     = document.getElementById('openBtn');
+const nav         = document.getElementById('nav');
 
 const chapterLabel = document.getElementById('chapterLabel');
 const pageTitle    = document.getElementById('pageTitle');
 const pageContent  = document.getElementById('pageContent');
 const sideTitle    = document.getElementById('sideTitle');
 const sideContent  = document.getElementById('sideContent');
-const pageNumLeft  = document.getElementById('pageNumLeft');
-const pageNumRight = document.getElementById('pageNumRight');
+const pgLeft       = document.getElementById('pgLeft');
+const pgRight      = document.getElementById('pgRight');
+const navInd       = document.getElementById('navInd');
 
-const prevBtn      = document.getElementById('prevButton');
-const nextBtn      = document.getElementById('nextButton');
-const pageIndicator = document.getElementById('pageIndicator');
+const prevBtn  = document.getElementById('prevBtn');
+const nextBtn  = document.getElementById('nextBtn');
 
-const flipWrapper  = document.getElementById('flipWrapper');
-const flipPage     = document.getElementById('flipPage');
-const flipFront    = document.getElementById('flipFront');
-const flipBack     = document.getElementById('flipBack');
+const flipWrap = document.getElementById('flipWrap');
+const flip     = document.getElementById('flip');
+const flipFront = document.getElementById('flipFront');
+const flipBack  = document.getElementById('flipBack');
 
-const leftPage     = document.getElementById('leftPage');
-const rightPage    = document.getElementById('rightPage');
+const leftPage  = document.getElementById('leftPage');
+const rightPage = document.getElementById('rightPage');
 
 /* =============================================
    ESTADO
    ============================================= */
 let currentPage = 0;
 let isAnimating = false;
+let isOpen      = false;
+
+const roman = ['I', 'II', 'III', 'IV'];
 
 /* =============================================
    PARTÍCULAS DE POEIRA
    ============================================= */
-function createDust() {
+function spawnDust() {
   const container = document.getElementById('dustContainer');
-  const count = 18;
-
-  for (let i = 0; i < count; i++) {
-    const dust = document.createElement('div');
-    dust.className = 'dust';
-
+  for (let i = 0; i < 20; i++) {
+    const d = document.createElement('div');
+    d.className = 'dust';
     const size = Math.random() * 5 + 2;
-    dust.style.cssText = `
-      width: ${size}px;
-      height: ${size}px;
-      left: ${Math.random() * 100}%;
-      top: ${Math.random() * 100 + 100}%;
-      animation-duration: ${Math.random() * 18 + 10}s;
-      animation-delay: ${Math.random() * 12}s;
+    d.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random() * 100}%;
+      top:${Math.random() * 60 + 100}%;
+      animation-duration:${Math.random() * 16 + 10}s;
+      animation-delay:${Math.random() * 14}s;
     `;
-
-    container.appendChild(dust);
+    container.appendChild(d);
   }
 }
 
 /* =============================================
    ABRIR LIVRO
    ============================================= */
-function openBook() {
-  bookCover.classList.add('opened');
-  bookPages.classList.add('visible');
-  renderPage();
-}
+openBtn.addEventListener('click', () => {
+  if (isOpen) return;
+  isOpen = true;
+
+  // 1. Expande o wrapper + vira a capa (via CSS .is-open)
+  bookWrapper.classList.add('is-open');
+
+  // 2. Renderiza a primeira página
+  renderPage(false);
+
+  // 3. Navagação aparece via CSS seletor ~ depois do wrapper
+});
 
 /* =============================================
    RENDERIZAR PÁGINA
    ============================================= */
-function renderPage(animate = false) {
-  const page = pages[currentPage];
+function renderPage(animate = true) {
+  const p = pages[currentPage];
 
-  if (animate) {
-    leftPage.classList.add('fading-in');
-    rightPage.classList.add('fading-in');
-    setTimeout(() => {
-      leftPage.classList.remove('fading-in');
-      rightPage.classList.remove('fading-in');
-    }, 900);
-  }
+  chapterLabel.textContent = p.chapter;
+  pageTitle.textContent    = p.title;
+  pageContent.textContent  = p.content;
+  sideTitle.textContent    = p.sideTitle;
+  sideContent.textContent  = p.sideContent;
+  pgLeft.textContent       = p.num;
+  pgRight.textContent      = p.num;
 
-  chapterLabel.textContent = page.chapter;
-  pageTitle.textContent    = page.title;
-  pageContent.textContent  = page.content;
-  sideTitle.textContent    = page.sideTitle;
-  sideContent.textContent  = page.sideContent;
-  pageNumLeft.textContent  = page.pageNum;
-  pageNumRight.textContent = page.pageNum;
-
-  const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
-  pageIndicator.textContent = `${romanNumerals[currentPage]} / ${romanNumerals[pages.length - 1]}`;
+  navInd.textContent = `${roman[currentPage]} / ${roman[pages.length - 1]}`;
 
   prevBtn.disabled = currentPage === 0 || isAnimating;
   nextBtn.disabled = currentPage === pages.length - 1 || isAnimating;
+
+  if (animate) {
+    leftPage.classList.add('reveal');
+    rightPage.classList.add('reveal');
+    setTimeout(() => {
+      leftPage.classList.remove('reveal');
+      rightPage.classList.remove('reveal');
+    }, 900);
+  }
 }
 
 /* =============================================
-   ANIMAÇÃO DE VIRADA DE PÁGINA
+   CLONE DE CONTEÚDO PARA O FLIP
    ============================================= */
-function clonePageContent(targetEl, pageIndex, side) {
-  const page = pages[pageIndex];
-  if (!page) return;
+function buildPageHTML(index, side) {
+  const p = pages[index];
+  if (!p) return '';
 
-  let html = '';
-  if (side === 'left') {
-    html = `
-      <div style="padding: 52px 48px; height: 100%; position: relative;">
-        <span style="font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: #6b3f1e; display: inline-block; margin-bottom: 20px; border-bottom: 1px solid rgba(107,63,30,0.3); padding-bottom: 6px;">${page.chapter}</span>
-        <h2 style="font-family: 'Cinzel Decorative', serif; font-size: clamp(1.4rem, 2.5vw, 2.2rem); color: #1e0f05; line-height: 1.2; margin-bottom: 14px;">${page.title}</h2>
-        <div style="width: 60%; height: 1px; background: linear-gradient(90deg, #6b3f1e, transparent); margin-bottom: 20px; opacity: 0.4;"></div>
-        <p style="font-size: 1.05rem; line-height: 1.9; color: #3f2412; font-style: italic; font-family: 'IM Fell English', Georgia, serif;">${page.content}</p>
-        <span style="position: absolute; bottom: 24px; left: 48px; font-family: 'Cinzel', serif; font-size: 0.78rem; color: #6b3f1e; opacity: 0.6; letter-spacing: 2px;">${page.pageNum}</span>
-      </div>`;
-  } else {
-    html = `
-      <div style="padding: 52px 48px; height: 100%; position: relative;">
-        <h3 style="font-family: 'Cinzel', serif; font-size: clamp(1.1rem, 2vw, 1.6rem); color: #1e0f05; line-height: 1.3; margin-bottom: 14px;">${page.sideTitle}</h3>
-        <div style="width: 60%; height: 1px; background: linear-gradient(90deg, #6b3f1e, transparent); margin-bottom: 20px; opacity: 0.4;"></div>
-        <p style="font-size: 1.05rem; line-height: 1.9; color: #3f2412; font-style: italic; font-family: 'IM Fell English', Georgia, serif;">${page.sideContent}</p>
-        <span style="position: absolute; bottom: 24px; right: 48px; font-family: 'Cinzel', serif; font-size: 0.78rem; color: #6b3f1e; opacity: 0.6; letter-spacing: 2px;">${page.pageNum}</span>
-      </div>`;
-  }
+  const isLeft = side === 'left';
+  const bg = isLeft
+    ? 'linear-gradient(90deg, rgba(60,28,8,0.15) 0%, transparent 7%), #e8d5a0'
+    : 'linear-gradient(270deg, rgba(60,28,8,0.16) 0%, transparent 7%), #e8d5a0';
 
-  targetEl.innerHTML = html;
+  const contentHTML = isLeft
+    ? `<span style="display:block;font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:3px;text-transform:uppercase;color:#7a4a20;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(120,75,30,0.3);">${p.chapter}</span>
+       <h2 style="font-family:'Cinzel Decorative',serif;font-size:1.55rem;color:#2a1408;line-height:1.2;margin-bottom:14px;">${p.title}</h2>
+       <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;width:65%;">
+         <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(120,75,30,0.5),transparent);"></div>
+         <span style="font-size:0.58rem;color:#c9933a;">✦</span>
+       </div>
+       <p style="font-size:1rem;line-height:1.92;color:#3f2010;font-style:italic;font-family:'IM Fell English',Georgia,serif;">${p.content}</p>
+       <span style="position:absolute;bottom:26px;left:44px;font-family:'Cinzel',serif;font-size:0.7rem;color:#7a4a20;opacity:0.55;letter-spacing:2px;">${p.num}</span>`
+    : `<h3 style="font-family:'Cinzel',serif;font-size:1.35rem;color:#2a1408;line-height:1.3;margin-bottom:14px;">${p.sideTitle}</h3>
+       <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;width:65%;">
+         <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(120,75,30,0.5),transparent);"></div>
+         <span style="font-size:0.58rem;color:#c9933a;">✦</span>
+       </div>
+       <p style="font-size:1rem;line-height:1.92;color:#3f2010;font-style:italic;font-family:'IM Fell English',Georgia,serif;">${p.sideContent}</p>
+       <span style="position:absolute;bottom:26px;right:44px;font-family:'Cinzel',serif;font-size:0.7rem;color:#7a4a20;opacity:0.55;letter-spacing:2px;">${p.num}</span>`;
+
+  return `<div style="padding:52px 44px 44px;height:100%;position:relative;overflow:hidden;background:${bg};">${contentHTML}</div>`;
 }
 
-function turnPage(direction) {
+/* =============================================
+   VIRAR PÁGINA
+   ============================================= */
+function turnPage(dir) {
   if (isAnimating) return;
 
-  const isNext = direction === 'next';
-  const nextIndex = isNext ? currentPage + 1 : currentPage - 1;
-
-  if (nextIndex < 0 || nextIndex >= pages.length) return;
+  const isNext  = dir === 'next';
+  const nextIdx = isNext ? currentPage + 1 : currentPage - 1;
+  if (nextIdx < 0 || nextIdx >= pages.length) return;
 
   isAnimating = true;
   prevBtn.disabled = true;
   nextBtn.disabled = true;
 
-  // Prepara os dois lados da página girando
+  // Posiciona o flip-wrap
   if (isNext) {
-    // Frente: direita atual | Verso: esquerda próxima
-    clonePageContent(flipFront, currentPage, 'right');
-    clonePageContent(flipBack,  nextIndex,   'left');
-    flipWrapper.style.left  = '';
-    flipWrapper.style.right = '0';
-    flipWrapper.style.width = '50%';
-    flipWrapper.style.transformOrigin = 'left center';
+    flipWrap.style.left   = '';
+    flipWrap.style.right  = '0';
+    flipWrap.style.width  = '50%';
+    flip.style.transformOrigin = 'left center';
+    flipFront.innerHTML = buildPageHTML(currentPage, 'right');
+    flipBack.innerHTML  = buildPageHTML(nextIdx,     'left');
   } else {
-    // Frente: esquerda atual | Verso: direita próxima  
-    clonePageContent(flipFront, currentPage, 'left');
-    clonePageContent(flipBack,  nextIndex,   'right');
-    flipWrapper.style.left  = '0';
-    flipWrapper.style.right = '';
-    flipWrapper.style.width = '50%';
-    flipWrapper.style.transformOrigin = 'right center';
+    flipWrap.style.left   = '0';
+    flipWrap.style.right  = '';
+    flipWrap.style.width  = '50%';
+    flip.style.transformOrigin = 'right center';
+    flipFront.innerHTML = buildPageHTML(currentPage, 'left');
+    flipBack.innerHTML  = buildPageHTML(nextIdx,     'right');
   }
 
-  flipPage.style.transform = isNext ? 'rotateY(0deg)' : 'rotateY(-180deg)';
-  flipPage.style.animation = 'none';
-  flipWrapper.classList.remove('flipping-next', 'flipping-prev');
+  // Estado inicial do flip
+  flip.style.animation  = 'none';
+  flip.style.transform  = isNext ? 'rotateY(0deg)' : 'rotateY(-180deg)';
+  flipWrap.classList.remove('to-left', 'to-right');
+  void flip.offsetWidth; // reflow
 
-  // Força reflow
-  void flipPage.offsetWidth;
+  // Inicia animação
+  flipWrap.classList.add(isNext ? 'to-left' : 'to-right');
 
-  // Inicia a animação
-  flipWrapper.classList.add(isNext ? 'flipping-next' : 'flipping-prev');
+  const dur = parseInt(
+    getComputedStyle(document.documentElement).getPropertyValue('--flip-dur')
+  ) || 850;
 
-  // Na metade da animação: troca o conteúdo das páginas de fundo
-  const halfTime = parseInt(getComputedStyle(document.documentElement)
-    .getPropertyValue('--flip-dur')) || 900;
-
+  // Na metade: troca conteúdo de fundo
   setTimeout(() => {
-    currentPage = nextIndex;
+    currentPage = nextIdx;
     renderPage(false);
-  }, halfTime * 0.5);
+  }, dur * 0.48);
 
-  // Ao final da animação: limpa
+  // No fim: limpa
   setTimeout(() => {
-    flipWrapper.classList.remove('flipping-next', 'flipping-prev');
+    flipWrap.classList.remove('to-left', 'to-right');
     flipFront.innerHTML = '';
     flipBack.innerHTML  = '';
-    flipPage.style.transform = '';
-
+    flip.style.transform = '';
+    flip.style.animation = '';
     isAnimating = false;
     renderPage(true);
-  }, halfTime + 60);
+  }, dur + 80);
 }
 
 /* =============================================
    EVENTOS
    ============================================= */
-openBookBtn.addEventListener('click', openBook);
-nextBtn.addEventListener('click', () => turnPage('next'));
 prevBtn.addEventListener('click', () => turnPage('prev'));
+nextBtn.addEventListener('click', () => turnPage('next'));
 
-// Suporte a teclado
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') turnPage('next');
-  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   turnPage('prev');
+document.addEventListener('keydown', e => {
+  if (!isOpen) return;
+  if (e.key === 'ArrowRight') turnPage('next');
+  if (e.key === 'ArrowLeft')  turnPage('prev');
 });
 
 /* =============================================
    INIT
    ============================================= */
-createDust();
-renderPage();
+spawnDust();
