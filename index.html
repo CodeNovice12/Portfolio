@@ -7,13 +7,37 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/css/page-flip.min.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+  <!-- Fase 1: ambiente (mesa, luz, vinheta) -->
+  <div class="study" aria-hidden="true">
+    <div class="study-wood"></div>
+    <div class="candlelight"></div>
+    <div class="vignette"></div>
+  </div>
+
   <div class="dust-container" id="dustContainer"></div>
 
   <main class="scene">
+
+    <!-- Vela e objetos decorativos -->
+    <div class="scene-props" aria-hidden="true">
+      <div class="candle">
+        <div class="candle-holder"></div>
+        <div class="candle-wax"></div>
+        <div class="candle-flame"></div>
+        <div class="candle-glow"></div>
+      </div>
+      <div class="parchment parchment-a"></div>
+      <div class="parchment parchment-b"></div>
+      <div class="bowl"></div>
+    </div>
+
+    <div class="desk-stage">
+      <div class="book-contact-shadow"></div>
 
     <!--
       ESTRUTURA:
@@ -27,10 +51,17 @@
       <div class="book-closed" id="bookClosed">
 
         <!-- Lombada -->
-        <div class="spine"></div>
+        <div class="spine">
+          <span class="spine-rib"></span>
+          <span class="spine-rib"></span>
+          <span class="spine-rib"></span>
+          <span class="spine-rib"></span>
+          <span class="spine-rib"></span>
+        </div>
 
         <!-- Contra capa (fica por baixo, lado esquerdo) -->
         <div class="back-cover">
+          <div class="cover-texture"></div>
           <div class="back-cover-inner">
             <div class="back-ornament"></div>
             <p class="back-tagline">Uma jornada contada em código</p>
@@ -40,7 +71,74 @@
 
         <!-- Capa (fica por cima, lado direito — vira para esquerda ao abrir) -->
         <div class="front-cover" id="frontCover">
+          <div class="cover-back-face" aria-hidden="true"></div>
+          <div class="cover-face cover-front-face">
           <div class="cover-texture"></div>
+          <div class="cover-wear"></div>
+          <div class="cover-highlight"></div>
+
+          <!-- Fase 2: cantoneiras e emblema -->
+          <div class="cover-corners" aria-hidden="true">
+            <svg class="corner corner-tl" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 4 H44 V12 H16 V44 H4 Z" fill="none" stroke="url(#goldGrad)" stroke-width="1.5"/>
+              <path d="M4 4 L20 20" stroke="url(#goldGrad)" stroke-width="0.8" opacity="0.6"/>
+              <circle cx="10" cy="10" r="2.5" fill="url(#goldFill)"/>
+            </svg>
+            <svg class="corner corner-tr" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+              <path d="M52 4 H12 V12 H40 V44 H52 Z" fill="none" stroke="url(#goldGrad)" stroke-width="1.5"/>
+              <path d="M52 4 L36 20" stroke="url(#goldGrad)" stroke-width="0.8" opacity="0.6"/>
+              <circle cx="46" cy="10" r="2.5" fill="url(#goldFill)"/>
+            </svg>
+            <svg class="corner corner-bl" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 52 H44 V44 H16 V12 H4 Z" fill="none" stroke="url(#goldGrad)" stroke-width="1.5"/>
+              <path d="M4 52 L20 36" stroke="url(#goldGrad)" stroke-width="0.8" opacity="0.6"/>
+              <circle cx="10" cy="46" r="2.5" fill="url(#goldFill)"/>
+            </svg>
+            <svg class="corner corner-br" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+              <path d="M52 52 H12 V44 H40 V12 H52 Z" fill="none" stroke="url(#goldGrad)" stroke-width="1.5"/>
+              <path d="M52 52 L36 36" stroke="url(#goldGrad)" stroke-width="0.8" opacity="0.6"/>
+              <circle cx="46" cy="46" r="2.5" fill="url(#goldFill)"/>
+            </svg>
+            <svg width="0" height="0" aria-hidden="true">
+              <defs>
+                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f0d080"/>
+                  <stop offset="50%" stop-color="#c9933a"/>
+                  <stop offset="100%" stop-color="#8a5a18"/>
+                </linearGradient>
+                <radialGradient id="goldFill" cx="40%" cy="35%">
+                  <stop offset="0%" stop-color="#ffe8a8"/>
+                  <stop offset="100%" stop-color="#a07020"/>
+                </radialGradient>
+              </defs>
+            </svg>
+          </div>
+
+          <svg class="cover-emblem" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="60" cy="60" r="54" fill="none" stroke="url(#emblemGold)" stroke-width="1.2" opacity="0.7"/>
+            <circle cx="60" cy="60" r="38" fill="none" stroke="url(#emblemGold)" stroke-width="0.8" opacity="0.5"/>
+            <g stroke="url(#emblemGold)" stroke-width="1" fill="none" opacity="0.85">
+              <line x1="60" y1="8" x2="60" y2="28"/><line x1="60" y1="92" x2="60" y2="112"/>
+              <line x1="8" y1="60" x2="28" y2="60"/><line x1="92" y1="60" x2="112" y2="60"/>
+              <line x1="22" y1="22" x2="36" y2="36"/><line x1="98" y1="98" x2="84" y2="84"/>
+              <line x1="98" y1="22" x2="84" y2="36"/><line x1="22" y1="98" x2="36" y2="84"/>
+            </g>
+            <polygon points="60,18 66,42 90,42 70,56 78,80 60,66 42,80 50,56 30,42 54,42" fill="url(#emblemFill)" opacity="0.9"/>
+            <circle cx="60" cy="60" r="8" fill="url(#emblemFill)"/>
+            <defs>
+              <linearGradient id="emblemGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f5e0a0"/>
+                <stop offset="50%" stop-color="#d4a84a"/>
+                <stop offset="100%" stop-color="#7a5018"/>
+              </linearGradient>
+              <radialGradient id="emblemFill" cx="35%" cy="30%">
+                <stop offset="0%" stop-color="#fff0c0"/>
+                <stop offset="60%" stop-color="#d4a030"/>
+                <stop offset="100%" stop-color="#6a4010"/>
+              </radialGradient>
+            </defs>
+          </svg>
+
           <div class="cover-inner">
             <div class="cover-ornament">
               <div class="orn-line"></div>
@@ -60,62 +158,15 @@
               <div class="orn-line"></div>
             </div>
           </div>
+          </div>
         </div>
 
       </div>
       <!-- fim .book-closed -->
 
-      <!-- ========== LIVRO ABERTO ========== -->
+      <!-- ========== LIVRO ABERTO (St.PageFlip) ========== -->
       <div class="book-open" id="bookOpen">
-
-        <!-- Sombra da lombada -->
-        <div class="gutter"></div>
-
-        <!-- Página esquerda -->
-        <article class="page left-page" id="leftPage">
-          <div class="page-inner">
-            <span class="chapter-tag" id="chapterLabel">◆ &nbsp;Prólogo&nbsp; ◆</span>
-            <h2 class="page-title" id="pageTitle">O Início da Jornada</h2>
-            <div class="page-rule">
-              <div class="rule-line"></div>
-              <span class="rule-sym">✦</span>
-              <div class="rule-line"></div>
-            </div>
-            <p class="page-body" id="pageContent">
-              Toda jornada começa antes mesmo do herói entender o chamado.
-              Foram anos aprendendo a linguagem dos dados, antes de perceber
-              que a programação seria o mapa para o destino.
-            </p>
-          </div>
-          <span class="pg-num left-n" id="pgLeft">— I —</span>
-        </article>
-
-        <!-- Página direita -->
-        <article class="page right-page" id="rightPage">
-          <div class="page-inner">
-            <h3 class="side-title" id="sideTitle">Notas da Jornada</h3>
-            <div class="page-rule">
-              <div class="rule-line"></div>
-              <span class="rule-sym">✦</span>
-              <div class="rule-line"></div>
-            </div>
-            <p class="page-body" id="sideContent">
-              Aqui ficarão os detalhes, projetos, tecnologias e conquistas
-              de cada capítulo desta história.
-            </p>
-          </div>
-          <span class="pg-num right-n" id="pgRight">— I —</span>
-        </article>
-
-        <!-- Página virando -->
-        <div class="flip-wrap" id="flipWrap">
-          <div class="flip" id="flip">
-            <div class="flip-front" id="flipFront"></div>
-            <div class="flip-back"  id="flipBack"></div>
-          </div>
-          <div class="flip-shadow"></div>
-        </div>
-
+        <div id="pageFlipBook" class="page-flip-book" aria-label="Páginas do livro"></div>
       </div>
       <!-- fim .book-open -->
 
@@ -129,8 +180,12 @@
       <button class="nav-btn" id="nextBtn">Próxima &nbsp;►</button>
     </nav>
 
+    </div>
+    <!-- fim .desk-stage -->
+
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
