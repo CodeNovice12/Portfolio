@@ -1,20 +1,19 @@
 /* =============================================
-   DELAYS NOMEADOS — sem números mágicos
+   DELAYS NOMEADOS
    ============================================= */
 const DELAY = {
-  WRAPPER_EXPAND: 150, // aguarda CSS transition do wrapper
-  PAGEFLIP_TURN:   80, // aguarda loadFromHTML processar
+  WRAPPER_EXPAND: 150,
+  PAGEFLIP_TURN:   80,
+  STYLE_CLEANUP:  500,
 };
 
 /* =============================================
    ESTADO
    ============================================= */
 const state = {
-  isOpen:      false,
-  isFlipping:  false,
-  currentPage: 0,
-  pageFlip:    null,
-  initTimer:   null,
+  isOpen:     false,
+  isFlipping: false,
+  pageFlip:   null,
 };
 
 /* =============================================
@@ -32,7 +31,7 @@ const els = {
    POEIRA
    ============================================= */
 function spawnDust() {
-  const container  = document.getElementById('dustContainer');
+  const container = document.getElementById('dustContainer');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const count = reduceMotion ? 8 : 24;
 
@@ -53,35 +52,119 @@ function spawnDust() {
   }
 }
 
-function clearBookTimers() {
-  if (state.initTimer) {
-    clearTimeout(state.initTimer);
-    state.initTimer = null;
-  }
+/* =============================================
+   UTILITÁRIOS
+   ============================================= */
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
-function syncPageFlipSize() {
-  const styles = getComputedStyle(document.documentElement);
-  const pageW  = parseInt(styles.getPropertyValue('--a4-w')) || 410;
-  const pageH  = parseInt(styles.getPropertyValue('--a4-h')) || 580;
-  els.pageFlipHost.style.width  = `${pageW}px`;
-  els.pageFlipHost.style.height = `${pageH}px`;
-  return { pageW, pageH };
+/* =============================================
+   RENDERIZADOR DE BLOCOS
+   Cada tipo de bloco vira um pedaço de HTML.
+   Para adicionar um novo tipo: criar função aqui
+   e registrar no BLOCK_RENDERERS.
+   ============================================= */
+const BLOCK_RENDERERS = {
+
+  p(block) {
+    return `<p class="page-body">${escapeHtml(block.text)}</p>`;
+  },
+
+  list(block) {
+    const items = block.items.map(i => `<li>${escapeHtml(i)}</li>`).join('');
+    return `
+      <div class="block-list">
+        <h4 class="block-list-title">${escapeHtml(block.title)}</h4>
+        <ul class="block-list-items">${items}</ul>
+      </div>`;
+  },
+
+  mission(block) {
+    const meta = (block.meta || [])
+      .map(([k, v]) => `<span class="meta-row"><strong>${escapeHtml(k)}:</strong> ${escapeHtml(v)}</span>`)
+      .join('');
+    return `
+      <div class="block-mission">
+        <h4 class="mission-title">${escapeHtml(block.title)}</h4>
+        ${meta ? `<div class="mission-meta">${meta}</div>` : ''}
+        <p class="mission-text">${escapeHtml(block.text)}</p>
+      </div>`;
+  },
+
+  quote(block) {
+    return `
+      <blockquote class="block-quote">
+        <p>&ldquo;${escapeHtml(block.text)}&rdquo;</p>
+        ${block.author ? `<cite>— ${escapeHtml(block.author)}</cite>` : ''}
+      </blockquote>`;
+  },
+
+  center(block) {
+    return `
+      <div class="block-center">
+        <h3 class="center-title">${escapeHtml(block.title)}</h3>
+        ${block.sub ? `<p class="center-sub">${escapeHtml(block.sub)}</p>` : ''}
+      </div>`;
+  },
+
+};
+
+function renderBlocks(blocks) {
+  return blocks
+    .map(block => {
+      const renderer = BLOCK_RENDERERS[block.type];
+      if (!renderer) {
+        console.warn(`Tipo de bloco desconhecido: ${block.type}`);
+        return '';
+      }
+      return renderer(block);
+    })
+    .join('');
 }
 
-function restartOpenAnimation() {
-  els.bookOpen.style.animation = 'none';
-  void els.bookOpen.offsetWidth;
-  els.bookOpen.style.animation = '';
+/* =============================================
+   MONTAGEM DAS PÁGINAS
+   ============================================= */
+function pageRuleHtml() {
+  return `<div class="page-rule">
+    <div class="rule-line"></div>
+    <span class="rule-sym">✦</span>
+    <div class="rule-line"></div>
+  </div>`;
 }
 
-function refreshPageFlip() {
-  if (!state.pageFlip || !state.isOpen) return;
+function createPageElement(page, index) {
+  const isLeft = index % 2 === 0;
+  const el = document.createElement('div');
+  el.className = `page-flip-sheet page-flip-sheet--${isLeft ? 'left' : 'right'}`;
+  el.dataset.page = 'page';
 
-  syncPageFlipSize();
-  state.pageFlip.turnToPage(0);
-  state.currentPage = 0;
-  state.pageFlip.update();
+  const numClass = isLeft ? 'left-n' : 'right-n';
+  const header = [
+    page.tag   ? `<span class="chapter-tag">${escapeHtml(page.tag)}</span>` : '',
+    page.title ? `<h2 class="page-title">${escapeHtml(page.title)}</h2>${pageRuleHtml()}` : '',
+  ].join('');
+
+  el.innerHTML = `
+    <div class="page-inner">
+      ${header}
+      ${renderBlocks(page.blocks)}
+      <span class="pg-num ${numClass}">${index + 1} / ${PAGES_DATA.length}</span>
+    </div>`;
+
+  return el;
+}
+
+function buildPageFlipDOM() {
+  els.pageFlipHost.innerHTML = '';
+  PAGES_DATA.forEach((page, index) => {
+    els.pageFlipHost.appendChild(createPageElement(page, index));
+  });
 }
 
 /* =============================================
@@ -91,29 +174,16 @@ function openBook() {
   if (state.isOpen) return;
   state.isOpen = true;
 
-  clearBookTimers();
-  els.bookOpen.removeAttribute('style');
-  restartOpenAnimation();
-
   els.bookWrapper.classList.add('is-open');
   document.querySelector('.scene')?.classList.add('is-reading');
 
-  syncPageFlipSize();
+  const styles = getComputedStyle(document.documentElement);
+  const pageW  = parseInt(styles.getPropertyValue('--a4-w')) || 410;
+  const pageH  = parseInt(styles.getPropertyValue('--a4-h')) || 580;
+  els.pageFlipHost.style.width  = `${pageW}px`;
+  els.pageFlipHost.style.height = `${pageH}px`;
 
-  if (state.pageFlip) {
-    state.initTimer = setTimeout(() => {
-      state.initTimer = null;
-      refreshPageFlip();
-      // PageFlip só recalcula layout com o livro visível
-      setTimeout(refreshPageFlip, 900);
-    }, DELAY.WRAPPER_EXPAND);
-    return;
-  }
-
-  state.initTimer = setTimeout(() => {
-    state.initTimer = null;
-    initPageFlip();
-  }, DELAY.WRAPPER_EXPAND);
+  setTimeout(initPageFlip, DELAY.WRAPPER_EXPAND);
 }
 
 /* =============================================
@@ -121,72 +191,40 @@ function openBook() {
    ============================================= */
 function closeBook() {
   if (!state.isOpen) return;
-  state.isOpen      = false;
-  state.currentPage = 0;
+  state.isOpen = false;
 
-  clearBookTimers();
+  if (state.pageFlip) {
+    try { state.pageFlip.destroy(); } catch (e) {}
+    state.pageFlip = null;
+  }
+
+  // O destroy() da St.PageFlip remove o host do DOM.
+  // Solução: remove qualquer resíduo e recria o host do zero.
+  const oldHost = document.getElementById('pageFlipBook');
+  if (oldHost) oldHost.remove();
+  els.bookOpen.querySelectorAll('.stf__parent').forEach(n => n.remove());
+
+  const newHost = document.createElement('div');
+  newHost.id = 'pageFlipBook';
+  newHost.className = 'page-flip-book';
+  newHost.setAttribute('aria-label', 'Páginas do livro');
+  els.bookOpen.prepend(newHost);
+  els.pageFlipHost = newHost; // atualiza a referência para o elemento novo
+
+  els.bookOpen.style.opacity       = '0';
+  els.bookOpen.style.visibility    = 'hidden';
+  els.bookOpen.style.pointerEvents = 'none';
 
   els.bookWrapper.classList.remove('is-open');
   document.querySelector('.scene')?.classList.remove('is-reading');
-}
 
-/* =============================================
-   UTILITÁRIOS
-   ============================================= */
-function escapeHtml(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function pageRuleHtml() {
-  return `<div class="page-rule">
-    <div class="rule-line"></div>
-    <span class="rule-sym">✦</span>
-    <div class="rule-line"></div>
-  </div>`;
-}
-
-/* =============================================
-   MONTAGEM DAS PÁGINAS
-   ============================================= */
-function createPageElement(chapter, side) {
-  const el = document.createElement('div');
-  el.className = `page-flip-sheet page-flip-sheet--${side}`;
-  el.dataset.page = 'page';
-
-  const numClass = side === 'left' ? 'left-n' : 'right-n';
-  const inner = side === 'left'
-    ? `<span class="chapter-tag">${escapeHtml(chapter.chapter)}</span>
-       <h2 class="page-title">${escapeHtml(chapter.title)}</h2>
-       ${pageRuleHtml()}
-       <p class="page-body">${escapeHtml(chapter.content)}</p>
-       <span class="pg-num ${numClass}">${chapter.num} / ${PAGES_DATA.length}</span>`
-    : `<h3 class="side-title">${escapeHtml(chapter.sideTitle)}</h3>
-       ${pageRuleHtml()}
-       <p class="page-body">${escapeHtml(chapter.sideContent).replace(/\n/g, '<br>')}</p>
-       <span class="pg-num ${numClass}">${chapter.num} / ${PAGES_DATA.length}</span>`;
-
-  el.innerHTML = `<div class="page-inner">${inner}</div>`;
-  return el;
-}
-
-function buildPageFlipDOM() {
-  els.pageFlipHost.innerHTML = '';
-  PAGES_DATA.forEach(chapter => {
-    els.pageFlipHost.appendChild(createPageElement(chapter, 'left'));
-    els.pageFlipHost.appendChild(createPageElement(chapter, 'right'));
-  });
+  setTimeout(() => els.bookOpen.removeAttribute('style'), DELAY.STYLE_CLEANUP);
 }
 
 /* =============================================
    INICIALIZAR PAGEFLIP
    ============================================= */
 function initPageFlip() {
-  if (!state.isOpen || state.pageFlip) return;
-
   if (typeof St === 'undefined' || !St.PageFlip) {
     console.error('St.PageFlip não carregou.');
     return;
@@ -194,7 +232,9 @@ function initPageFlip() {
 
   buildPageFlipDOM();
 
-  const { pageW, pageH } = syncPageFlipSize();
+  const styles = getComputedStyle(document.documentElement);
+  const pageW  = parseInt(styles.getPropertyValue('--a4-w')) || 410;
+  const pageH  = parseInt(styles.getPropertyValue('--a4-h')) || 580;
 
   state.pageFlip = new St.PageFlip(els.pageFlipHost, {
     width:               pageW,
@@ -216,17 +256,16 @@ function initPageFlip() {
 
   state.pageFlip.loadFromHTML(els.pageFlipHost.querySelectorAll('[data-page="page"]'));
 
+  // Guarda referência local — se closeBook rodar antes do timeout,
+  // a comparação detecta e não executa em cima de instância morta
+  const instance = state.pageFlip;
+
   setTimeout(() => {
-    if (state.pageFlip && state.isOpen) {
-      state.pageFlip.turnToPage(0);
-      state.currentPage = 0;
-      state.pageFlip.update();
+    if (state.pageFlip === instance && state.isOpen) {
+      instance.turnToPage(0);
+      instance.update();
     }
   }, DELAY.PAGEFLIP_TURN);
-
-  state.pageFlip.on('flip', (e) => {
-    state.currentPage = Math.floor(e.data / 2);
-  });
 
   state.pageFlip.on('changeState', (e) => {
     state.isFlipping = e.data === 'flipping';
